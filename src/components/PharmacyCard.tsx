@@ -1,6 +1,6 @@
-import { Card, CardContent, Typography, Link, Box } from "@mui/material";
+import { Box, Card, CardContent, Link, Typography } from "@mui/material";
 
-export interface PharmacyRaw {
+export interface Pharmacy {
   id: string;
   name: string;
   address: string;
@@ -15,11 +15,56 @@ export interface PharmacyRaw {
   photos?: string[];
 }
 
-export default function PharmacyCard({ pharmacy }: { pharmacy: PharmacyRaw }) {
+function formatUrl(url: string): string {
+  if (!url) return "";
+  
+  // remove spaces
+  url = url.trim();
+  if (!url) return "";
+  
+  // keep as is if already has protocol
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  
+  // add https:// prefix
+  return `https://${url}`;
+}
+
+export default function PharmacyCard({ pharmacy }: { pharmacy: Pharmacy }) {
+  const firstPhoto =
+    pharmacy.photos && pharmacy.photos.length > 0 ? pharmacy.photos[0] : null;
+
   return (
-    <>
-      <Card elevation={3} sx={{ p: 2 }}>
-        <CardContent>
+    <Card elevation={3} sx={{ p: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        {firstPhoto && (
+          <Box
+            sx={{
+              width: 150,
+              height: 150,
+              flexShrink: 0,
+              mr: 2,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "#f5f5f5",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={firstPhoto}
+              alt={`${pharmacy.name}`}
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                objectFit: "contain",
+              }}
+            />
+          </Box>
+        )}
+
+        <CardContent sx={{ flex: 1, p: 0 }}>
           <Typography
             variant="h6"
             component="h2"
@@ -61,7 +106,7 @@ export default function PharmacyCard({ pharmacy }: { pharmacy: PharmacyRaw }) {
           {pharmacy.url && (
             <Typography variant="body2" mt={1}>
               <Link
-                href={pharmacy.url}
+                href={formatUrl(pharmacy.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 color="primary"
@@ -71,7 +116,7 @@ export default function PharmacyCard({ pharmacy }: { pharmacy: PharmacyRaw }) {
             </Typography>
           )}
         </CardContent>
-      </Card>
-    </>
+      </Box>
+    </Card>
   );
 }
